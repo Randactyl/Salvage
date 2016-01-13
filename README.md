@@ -2,7 +2,7 @@
 Plugin for Rust Experimental servers using Oxide Mod
 
 ###Description:
-Allows a player to salvage items at any repair bench. A salvaged item yields half of the resource cost to make the item. If the item has
+Allows a player to salvage items **they know how to make** at any repair bench. A salvaged item yields half of the resource cost to make the item. If the item has
 a condition, the yeild is affected by the item's remaining condition.
 
 ###Usage:
