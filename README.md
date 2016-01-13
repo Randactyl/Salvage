@@ -21,5 +21,6 @@ There are no configuration files or additional setup steps.
 Remove Salvage.cs from your plugin directory. The plugin does not create any other files.
 
 ###Additional Notes:
-This plugin is tiny and does not persist any data between instances - currently salvaging players would have to re-enable salvaging if
+* This plugin is tiny and does not persist any data between instances - currently salvaging players would have to re-enable salvaging if
 the server was restarted or if the plugin was reloaded.
+* Any ammo in a salvaged weapon is currently discarded. Please unload ammo from weapons you wish to salvage.
