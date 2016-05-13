@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Oxide.Plugins {
-
-    [Info("Salvage", "Randactyl", "1.0.0")]
+    [Info("Salvage", "Randactyl", "1.1.0")]
     [Description("Use /salvage to enable/disable salvage mode at repair benches.")]
     public class Salvage : RustPlugin {
         Dictionary<BasePlayer, bool> salvagers = new Dictionary<BasePlayer, bool>();
