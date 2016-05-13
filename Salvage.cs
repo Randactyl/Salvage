@@ -8,8 +8,9 @@ namespace Oxide.Plugins {
     [Info("Salvage", "Randactyl", "1.0.0")]
     [Description("Use /salvage to enable/disable salvage mode at repair benches.")]
     public class Salvage : RustPlugin {
-        Dictionary<ulong, BasePlayer> salvagers = new Dictionary<ulong, BasePlayer>(); //[steamId] = player
-        Dictionary<string, ItemBlueprint> blueprints = new Dictionary<string, ItemBlueprint>(); //[shortname] = itemBp
+        Dictionary<BasePlayer, bool> salvagers = new Dictionary<BasePlayer, bool>();
+        Dictionary<BasePlayer, BaseEntity> benchMap = new Dictionary<BasePlayer, BaseEntity>();
+        Dictionary<string, ItemBlueprint> blueprints = new Dictionary<string, ItemBlueprint>();
 
         void OnServerInitialized() {
             //build bp lookup
@@ -18,14 +19,14 @@ namespace Oxide.Plugins {
 
         [ChatCommand("salvage")]
         void cmdSalvage(BasePlayer player, string command, string[] args) {
-            ulong steamId = player.userID;
-            
-            //if player is a salvager then remove them else add them
-            if (salvagers.ContainsKey(steamId)) {
-                salvagers.Remove(steamId);
+            //if player is a salvager
+            if(salvagers.ContainsKey(player)) {
+                //remove them
+                salvagers.Remove(player);
                 player.ChatMessage("Salvaging is now OFF.");
             } else {
-                salvagers[steamId] = player;
+                //add them
+                salvagers[player] = true;
                 player.ChatMessage("Salvaging is now ON. Visit a repair bench to salvage items.");
             }
         }
@@ -33,16 +34,32 @@ namespace Oxide.Plugins {
         void OnLootEntity(BaseEntity source, BaseEntity target) {
             //check entities
             if(source == null || target == null) return;
-            if(target.LookupShortPrefabName() != "repairbench_deployed.prefab") return;
-            
-            //store the last player to open the repair bench
-            BasePlayer player = (BasePlayer)source;
-            ulong steamId = player.userID;
-            
-            //if player is a salvager then send reminder message
-            if(salvagers.ContainsKey(steamId)) {
+            if(target.LookupShortPrefabName() != "repairbench_deployed.prefab"
+              && target.LookupShortPrefabName() != "repairbench_static.prefab") return;
+
+            BasePlayer player = (BasePlayer) source;
+
+            //if player is a salvager
+            if(salvagers.ContainsKey(player)) {
+                //store player in bench map
+                benchMap[player] = target;
+                
+                //send reminder message
                 player.ChatMessage("Remember, you're salvaging!");
             }
+        }
+        
+        void OnLootEntityEnd(BaseEntity source, BaseEntity target) {
+            //check entity is repair bench
+            if(source == null || target == null) return;
+            if(target.LookupShortPrefabName() != "repairbench_deployed.prefab"
+              && target.LookupShortPrefabName() != "repairbench_static.prefab") return;
+
+            BasePlayer player = (BasePlayer) source;
+
+            //if player is a salvager then remove from bench map
+            if(salvagers.ContainsKey(player))
+                benchMap.Remove(player);
         }
 
         void OnItemAddedToContainer(ItemContainer container, Item item) {
@@ -51,14 +68,22 @@ namespace Oxide.Plugins {
             
             //check entity is repair bench
             if(entity == null) return;
-            if(entity.LookupShortPrefabName() != "repairbench_deployed.prefab") return;
+            if(entity.LookupShortPrefabName() != "repairbench_deployed.prefab"
+              && entity.LookupShortPrefabName() != "repairbench_static.prefab") return;
+
+            //get player from bench map
+            BasePlayer player = null;
+            foreach(BasePlayer key in benchMap.Keys)
+                if(benchMap[key] == entity) {
+                    player = key;
+                    break;
+                }
             
-            //get player steamId
-            ulong steamId = entity.OwnerID;
+            //check player
+            if(player == null) return;
             
-            //attempt salvage
-            if(salvagers.ContainsKey(steamId))
-                SalvageItem(salvagers[steamId], item);
+            //salvage item
+            SalvageItem(player, item);
         }
 
         void SalvageItem(BasePlayer player, Item item) {
