@@ -33,8 +33,8 @@ namespace Oxide.Plugins {
         void OnLootEntity(BaseEntity source, BaseEntity target) {
             //check entities
             if(source == null || target == null) return;
-            if(target.LookupShortPrefabName() != "repairbench_deployed.prefab"
-              && target.LookupShortPrefabName() != "repairbench_static.prefab") return;
+            if(target.ShortPrefabName != "repairbench_deployed"
+              && target.ShortPrefabName != "repairbench_static") return;
 
             BasePlayer player = (BasePlayer) source;
 
@@ -51,8 +51,8 @@ namespace Oxide.Plugins {
         void OnLootEntityEnd(BaseEntity source, BaseEntity target) {
             //check entity is repair bench
             if(source == null || target == null) return;
-            if(target.LookupShortPrefabName() != "repairbench_deployed.prefab"
-              && target.LookupShortPrefabName() != "repairbench_static.prefab") return;
+            if(target.ShortPrefabName != "repairbench_deployed"
+              && target.ShortPrefabName != "repairbench_static") return;
 
             BasePlayer player = (BasePlayer) source;
 
@@ -67,8 +67,8 @@ namespace Oxide.Plugins {
             
             //check entity is repair bench
             if(entity == null) return;
-            if(entity.LookupShortPrefabName() != "repairbench_deployed.prefab"
-              && entity.LookupShortPrefabName() != "repairbench_static.prefab") return;
+            if(entity.ShortPrefabName != "repairbench_deployed"
+              && entity.ShortPrefabName != "repairbench_static") return;
 
             //get player from bench map
             BasePlayer player = null;
